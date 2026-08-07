@@ -387,7 +387,7 @@
 
         <div class="field-group">
           <label class="field-label">Tranche d'âge dominante (approximative)</label>
-          <input type="text" id="tranche_age" placeholder="Ex : 30 - 45 ans">
+          <input type="text" id="tranche_age" placeholder="Ex : 30 - 45 ans" required>
         </div>
       </section>
 
@@ -407,7 +407,7 @@
             <li><input type="checkbox" id="obj_celebrer" name="objectifs"><label for="obj_celebrer">Célébrer les résultats ou un événement particulier</label></li>
             <li class="with-inline-text">
               <input type="checkbox" id="obj_autre" name="objectifs"><label for="obj_autre">Autre :</label>
-              <input type="text" id="obj_autre_texte" class="inline-input">
+              <input type="text" id="obj_autre_texte" class="inline-input" required>
             </li>
           </ul>
         </div>
@@ -418,7 +418,7 @@
         <h2><span class="step-num">3</span> Contexte particulier</h2>
         <div class="field-group">
           <label class="field-label">Existe-t-il des enjeux internes que le Team Building devrait contribuer à adresser (réorganisation, nouveaux collaborateurs, difficultés de collaboration, changement organisationnel, etc.) ?</label>
-          <textarea id="contexte_particulier" placeholder="Votre réponse..."></textarea>
+          <textarea id="contexte_particulier" placeholder="Votre réponse..." required></textarea>
         </div>
       </section>
 
@@ -461,7 +461,7 @@
             <li><input type="checkbox" id="lieu_cotonou" name="lieu"><label for="lieu_cotonou">Cotonou / environs</label></li>
             <li class="with-inline-text">
               <input type="checkbox" id="lieu_autre" name="lieu"><label for="lieu_autre">Autre destination :</label>
-              <input type="text" id="lieu_autre_texte" class="inline-input">
+              <input type="text" id="lieu_autre_texte" class="inline-input" required>
             </li>
           </ul>
         </div>
@@ -474,7 +474,7 @@
           </ul>
           <div class="subfield">
             <label class="field-label">Si oui</label>
-            <input type="text" id="site_precision">
+            <input type="text" id="site_precision" required>
           </div>
         </div>
       </section>
@@ -497,7 +497,7 @@
 
         <div class="field-group">
           <label class="field-label">Activités ou contraintes à éviter</label>
-          <input type="text" id="act_a_eviter">
+          <input type="text" id="act_a_eviter" required>
         </div>
       </section>
 
@@ -529,12 +529,12 @@
           <ul class="checkbox-list">
             <li class="with-inline-text">
               <input type="checkbox" id="budget_defini" name="budget"><label for="budget_defini">Budget déjà défini :</label>
-              <input type="text" id="budget_defini_montant" class="inline-input" placeholder="Montant">
+              <input type="text" id="budget_defini_montant" class="inline-input" placeholder="Montant" required>
               <span>FCFA</span>
             </li>
             <li class="with-inline-text">
               <input type="checkbox" id="budget_fourchette" name="budget"><label for="budget_fourchette">Fourchette budgétaire disponible :</label>
-              <input type="text" id="budget_fourchette_montant" class="inline-input">
+              <input type="text" id="budget_fourchette_montant" class="inline-input" required>
             </li>
             <li><input type="checkbox" id="budget_proposer" name="budget"><label for="budget_proposer">Budget à proposer par IMPACT PLUS</label></li>
           </ul>
@@ -546,7 +546,7 @@
         <h2><span class="step-num">9</span> Contraintes particulières</h2>
         <div class="field-group">
           <label class="field-label">Contraintes institutionnelles, sécuritaires, alimentaires, médicales, vestimentaires ou autres à prendre en compte</label>
-          <textarea id="contraintes_particulieres" placeholder="Votre réponse..."></textarea>
+          <textarea id="contraintes_particulieres" placeholder="Votre réponse..." required></textarea>
         </div>
       </section>
 
@@ -571,7 +571,7 @@
 
         <div class="field-group">
           <label class="field-label">Processus particulier de validation/commande à anticiper</label>
-          <input type="text" id="processus_validation">
+          <input type="text" id="processus_validation" required>
         </div>
       </section>
 
@@ -613,6 +613,30 @@
   const stepCurrentEl = document.getElementById('stepCurrent');
   const stepNameEl = document.getElementById('stepName');
 
+  function setConditionalRequired(toggleId, targetId){
+    const toggle = document.getElementById(toggleId);
+    const target = document.getElementById(targetId);
+    if(!toggle || !target) return;
+
+    const update = () => {
+      const required = toggle.checked;
+      target.required = required;
+      target.disabled = !required;
+      if(!required){
+        target.value = '';
+      }
+    };
+
+    toggle.addEventListener('change', update);
+    update();
+  }
+
+  setConditionalRequired('obj_autre', 'obj_autre_texte');
+  setConditionalRequired('lieu_autre', 'lieu_autre_texte');
+  setConditionalRequired('budget_defini', 'budget_defini_montant');
+  setConditionalRequired('budget_fourchette', 'budget_fourchette_montant');
+  setConditionalRequired('site_oui', 'site_precision');
+
   function updateStepDisplay(){
     steps.forEach(s => {
       s.classList.toggle('active', parseInt(s.dataset.step) === currentStep);
@@ -653,6 +677,10 @@
           alert('Veuillez sélectionner au moins un profil concerné.');
           return false;
         }
+        if(!document.getElementById('tranche_age').value.trim()){
+          alert('Veuillez indiquer la tranche d\'âge dominante.');
+          return false;
+        }
         return true;
       case 2:
         if(!isAnyChecked(['obj_cohesion','obj_communication','obj_decloisonner','obj_collaboration','obj_confiance','obj_valeurs','obj_stress','obj_celebrer','obj_autre'])){
@@ -661,6 +689,12 @@
         }
         if(document.getElementById('obj_autre').checked && !document.getElementById('obj_autre_texte').value.trim()){
           alert('Veuillez préciser l\'autre objectif.');
+          return false;
+        }
+        return true;
+      case 3:
+        if(!document.getElementById('contexte_particulier').value.trim()){
+          alert('Veuillez renseigner le contexte particulier.');
           return false;
         }
         return true;
@@ -691,10 +725,24 @@
           alert('Veuillez indiquer si la CAGD dispose déjà d\'un site.');
           return false;
         }
+        if(document.getElementById('site_oui').checked && !document.getElementById('site_precision').value.trim()){
+          alert('Veuillez préciser le site existant.');
+          return false;
+        }
         return true;
       case 6:
         if(!isAnyChecked(['act_ludiques','act_challenges','act_sportives','act_reflexion','act_creatives','act_detente','act_combinaison'])){
           alert('Veuillez sélectionner au moins un type d\'activité souhaité.');
+          return false;
+        }
+        if(!document.getElementById('act_a_eviter').value.trim()){
+          alert('Veuillez indiquer les activités ou contraintes à éviter.');
+          return false;
+        }
+        return true;
+      case 7:
+        if(!isAnyChecked(['prest_conception','prest_site','prest_transport','prest_restauration','prest_materiel','prest_sonorisation','prest_photo','prest_branding','prest_cadeaux','prest_complete'])){
+          alert('Veuillez sélectionner au moins une prestation à prendre en charge.');
           return false;
         }
         return true;
@@ -712,6 +760,12 @@
           return false;
         }
         return true;
+      case 9:
+        if(!document.getElementById('contraintes_particulieres').value.trim()){
+          alert('Veuillez renseigner les contraintes particulières.');
+          return false;
+        }
+        return true;
       case 10:
         if(!document.getElementById('interlocuteur').value.trim()){
           alert('Veuillez indiquer l\'interlocuteur principal.');
@@ -723,6 +777,10 @@
         }
         if(!document.getElementById('delai_offre').value.trim()){
           alert('Veuillez indiquer le délai souhaité pour recevoir l\'offre.');
+          return false;
+        }
+        if(!document.getElementById('processus_validation').value.trim()){
+          alert('Veuillez indiquer le processus particulier de validation/commande à anticiper.');
           return false;
         }
         return true;
