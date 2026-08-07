@@ -370,7 +370,7 @@
         <div class="field-group">
           <label class="field-label">Effectif prévisionnel</label>
           <div class="with-inline-text">
-            <input type="number" id="effectif" min="0" class="inline-input" placeholder="Nombre">
+            <input type="number" id="effectif" min="0" class="inline-input" placeholder="Nombre" required>
             <span>personnes</span>
           </div>
         </div>
@@ -428,13 +428,13 @@
 
         <div class="field-group">
           <label class="field-label">Date/période envisagée</label>
-          <input type="text" id="date_periode" placeholder="Ex : Novembre 2026">
+          <input type="text" id="date_periode" placeholder="Ex : Novembre 2026" required>
         </div>
 
         <div class="field-group">
           <label class="field-label">Format</label>
           <ul class="radio-list">
-            <li><input type="radio" id="format_demi" name="format" value="Demi-journée"><label for="format_demi">Demi-journée</label></li>
+            <li><input type="radio" id="format_demi" name="format" value="Demi-journée" required><label for="format_demi">Demi-journée</label></li>
             <li><input type="radio" id="format_jour" name="format" value="Journée"><label for="format_jour">Journée</label></li>
             <li><input type="radio" id="format_2jours" name="format" value="2 jours"><label for="format_2jours">2 jours</label></li>
           </ul>
@@ -443,7 +443,7 @@
         <div class="field-group">
           <label class="field-label">Jour souhaité</label>
           <ul class="radio-list">
-            <li><input type="radio" id="jour_semaine" name="jour" value="Semaine"><label for="jour_semaine">Semaine</label></li>
+            <li><input type="radio" id="jour_semaine" name="jour" value="Semaine" required><label for="jour_semaine">Semaine</label></li>
             <li><input type="radio" id="jour_weekend" name="jour" value="Week-end"><label for="jour_weekend">Week-end</label></li>
             <li><input type="radio" id="jour_indifferent" name="jour" value="Indifférent"><label for="jour_indifferent">Indifférent</label></li>
           </ul>
@@ -469,7 +469,7 @@
         <div class="field-group">
           <label class="field-label">La CAGD dispose-t-elle déjà d'un site ?</label>
           <ul class="radio-list">
-            <li><input type="radio" id="site_oui" name="site_existant" value="Oui"><label for="site_oui">Oui</label></li>
+            <li><input type="radio" id="site_oui" name="site_existant" value="Oui" required><label for="site_oui">Oui</label></li>
             <li><input type="radio" id="site_non" name="site_existant" value="Non"><label for="site_non">Non</label></li>
           </ul>
           <div class="subfield">
@@ -556,17 +556,17 @@
 
         <div class="field-group">
           <label class="field-label">Interlocuteur principal</label>
-          <input type="text" id="interlocuteur">
+          <input type="text" id="interlocuteur" required>
         </div>
 
         <div class="field-group">
           <label class="field-label">Fonction</label>
-          <input type="text" id="fonction">
+          <input type="text" id="fonction" required>
         </div>
 
         <div class="field-group">
           <label class="field-label">Délai souhaité pour recevoir l'offre</label>
-          <input type="text" id="delai_offre">
+          <input type="text" id="delai_offre" required>
         </div>
 
         <div class="field-group">
@@ -635,6 +635,102 @@
     window.scrollTo({top: 0, behavior:'smooth'});
   }
 
+  function isAnyChecked(ids){
+    return ids.some(id => {
+      const el = document.getElementById(id);
+      return el && el.checked;
+    });
+  }
+
+  function validateStep(step){
+    switch(step){
+      case 1:
+        if(!document.getElementById('effectif').value.trim()){
+          alert('Veuillez indiquer l\'effectif prévisionnel.');
+          return false;
+        }
+        if(!isAnyChecked(['profil_direction','profil_cadres','profil_agents','profil_ensemble'])){
+          alert('Veuillez sélectionner au moins un profil concerné.');
+          return false;
+        }
+        return true;
+      case 2:
+        if(!isAnyChecked(['obj_cohesion','obj_communication','obj_decloisonner','obj_collaboration','obj_confiance','obj_valeurs','obj_stress','obj_celebrer','obj_autre'])){
+          alert('Veuillez sélectionner au moins un objectif prioritaire.');
+          return false;
+        }
+        if(document.getElementById('obj_autre').checked && !document.getElementById('obj_autre_texte').value.trim()){
+          alert('Veuillez préciser l\'autre objectif.');
+          return false;
+        }
+        return true;
+      case 4:
+        if(!document.getElementById('date_periode').value.trim()){
+          alert('Veuillez indiquer la date ou la période envisagée.');
+          return false;
+        }
+        if(!document.querySelector('input[name="format"]:checked')){
+          alert('Veuillez choisir un format.');
+          return false;
+        }
+        if(!document.querySelector('input[name="jour"]:checked')){
+          alert('Veuillez indiquer le jour souhaité.');
+          return false;
+        }
+        return true;
+      case 5:
+        if(!isAnyChecked(['lieu_locaux_cagd','lieu_hors_locaux','lieu_cotonou','lieu_autre'])){
+          alert('Veuillez sélectionner au moins un lieu.');
+          return false;
+        }
+        if(document.getElementById('lieu_autre').checked && !document.getElementById('lieu_autre_texte').value.trim()){
+          alert('Veuillez préciser l\'autre destination.');
+          return false;
+        }
+        if(!document.querySelector('input[name="site_existant"]:checked')){
+          alert('Veuillez indiquer si la CAGD dispose déjà d\'un site.');
+          return false;
+        }
+        return true;
+      case 6:
+        if(!isAnyChecked(['act_ludiques','act_challenges','act_sportives','act_reflexion','act_creatives','act_detente','act_combinaison'])){
+          alert('Veuillez sélectionner au moins un type d\'activité souhaité.');
+          return false;
+        }
+        return true;
+      case 8:
+        if(!isAnyChecked(['budget_defini','budget_fourchette','budget_proposer'])){
+          alert('Veuillez indiquer votre budget.');
+          return false;
+        }
+        if(document.getElementById('budget_defini').checked && !document.getElementById('budget_defini_montant').value.trim()){
+          alert('Veuillez préciser le montant du budget déjà défini.');
+          return false;
+        }
+        if(document.getElementById('budget_fourchette').checked && !document.getElementById('budget_fourchette_montant').value.trim()){
+          alert('Veuillez préciser la fourchette budgétaire disponible.');
+          return false;
+        }
+        return true;
+      case 10:
+        if(!document.getElementById('interlocuteur').value.trim()){
+          alert('Veuillez indiquer l\'interlocuteur principal.');
+          return false;
+        }
+        if(!document.getElementById('fonction').value.trim()){
+          alert('Veuillez indiquer la fonction.');
+          return false;
+        }
+        if(!document.getElementById('delai_offre').value.trim()){
+          alert('Veuillez indiquer le délai souhaité pour recevoir l\'offre.');
+          return false;
+        }
+        return true;
+      default:
+        return true;
+    }
+  }
+
   prevBtn.addEventListener('click', () => {
     if(currentStep > 1){
       currentStep--;
@@ -644,8 +740,10 @@
 
   nextBtn.addEventListener('click', () => {
     if(currentStep < totalSteps){
-      currentStep++;
-      updateStepDisplay();
+      if(validateStep(currentStep)){
+        currentStep++;
+        updateStepDisplay();
+      }
     }
   });
 
