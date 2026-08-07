@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionnaire Préliminaire — Team Building CAGD | Impact Plus</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --brand-blue: #2665AE;
+    --brand-blue-dark: #1B4C87;
+    --brand-blue-light: #E8F0FA;
+    --brand-accent: #7FB2E5;
+    --text-dark: #1F2937;
+    --text-muted: #6B7280;
+    --border: #DCE4EE;
+    --bg: #F4F7FB;
+    --white: #FFFFFF;
+    --success: #2E9E6C;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height:100vh;
+  }
+
+  .page-wrap{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  header.brand-header{
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue-dark) 100%);
+    padding: 28px 0 40px;
+    margin-bottom: -30px;
+  }
+
+  .brand-header-inner{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+  }
+
+  .brand-header-inner img{
+    height: 54px;
+    width:auto;
+    border-radius: 6px;
+  }
+
+  .brand-header-text h1{
+    color:#fff;
+    font-size: 1.15rem;
+    margin:0 0 4px;
+    font-weight:700;
+    letter-spacing:.3px;
+  }
+  .brand-header-text p{
+    color: var(--brand-accent);
+    margin:0;
+    font-size:.85rem;
+  }
+
+  .card{
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(27,76,135,0.12);
+    padding: 34px 36px 28px;
+    position:relative;
+    z-index:2;
+  }
+
+  .intro-block{
+    font-size:.92rem;
+    line-height:1.6;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 22px;
+    margin-bottom: 22px;
+  }
+  .intro-block strong{ color: var(--text-dark); }
+
+  /* Progress bar */
+  .progress-wrap{
+    margin-bottom: 30px;
+  }
+  .progress-track{
+    height: 8px;
+    background: var(--brand-blue-light);
+    border-radius: 6px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--brand-blue), var(--brand-accent));
+    border-radius:6px;
+    transition: width .35s ease;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:.78rem;
+    color: var(--text-muted);
+    margin-top:8px;
+    font-weight:600;
+  }
+  .progress-label span.step-name{
+    color: var(--brand-blue-dark);
+  }
+
+  /* Steps */
+  .step{
+    display:none;
+    animation: fadeIn .3s ease;
+  }
+  .step.active{ display:block; }
+
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .step h2{
+    font-size: 1.15rem;
+    color: var(--brand-blue-dark);
+    margin: 0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .step h2 .step-num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width: 30px;
+    height: 30px;
+    border-radius:50%;
+    background: var(--brand-blue);
+    color:#fff;
+    font-size: .85rem;
+    font-weight:700;
+    flex-shrink:0;
+  }
+
+  .field-group{
+    margin: 20px 0 20px 40px;
+  }
+
+  label.field-label{
+    display:block;
+    font-weight:600;
+    font-size:.92rem;
+    margin-bottom:8px;
+    color: var(--text-dark);
+  }
+  .field-hint{
+    font-size:.8rem;
+    color: var(--text-muted);
+    margin: -4px 0 10px;
+  }
+
+  input[type="text"], input[type="number"], textarea{
+    width:100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: .92rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: var(--white);
+    transition: border-color .2s;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, textarea:focus{
+    outline:none;
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px rgba(38,101,174,0.12);
+  }
+  textarea{ min-height: 90px; resize: vertical; }
+
+  .inline-input{
+    display:inline-block;
+    width: 220px;
+    margin-left: 8px;
+  }
+
+  .checkbox-list, .radio-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .checkbox-list li, .radio-list li{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .checkbox-list input[type="checkbox"], .radio-list input[type="radio"]{
+    width:18px;
+    height:18px;
+    accent-color: var(--brand-blue);
+    flex-shrink:0;
+    cursor:pointer;
+  }
+  .checkbox-list label, .radio-list label{
+    font-size:.92rem;
+    cursor:pointer;
+    color: var(--text-dark);
+  }
+  .with-inline-text{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .subfield{
+    margin-top: 14px;
+    padding-left: 28px;
+  }
+
+  /* Nav buttons */
+  .nav-buttons{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top: 34px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+
+  button{
+    font-family:inherit;
+    font-size:.92rem;
+    font-weight:600;
+    padding: 11px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor:pointer;
+    transition: all .2s;
+  }
+
+  .btn-prev{
+    background: var(--white);
+    color: var(--brand-blue);
+    border: 1.5px solid var(--brand-blue);
+  }
+  .btn-prev:hover{ background: var(--brand-blue-light); }
+  .btn-prev:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+  }
+
+  .btn-next{
+    background: var(--brand-blue);
+    color:#fff;
+  }
+  .btn-next:hover{ background: var(--brand-blue-dark); }
+
+  .btn-download{
+    background: var(--success);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:1rem;
+    padding: 14px 30px;
+  }
+  .btn-download:hover{ background:#25835a; }
+
+  .spacer{ flex:1; }
+
+  /* Summary / final step */
+  .summary-box{
+    background: var(--brand-blue-light);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 18px 0 26px;
+    font-size:.88rem;
+    color: var(--text-dark);
+    line-height:1.6;
+  }
+  .final-icon{
+    text-align:center;
+    font-size: 2.6rem;
+    margin-bottom: 6px;
+  }
+  .final-center{
+    text-align:center;
+    padding: 10px 0 6px;
+  }
+  .final-center p{
+    color: var(--text-muted);
+    font-size:.92rem;
+    max-width: 480px;
+    margin: 8px auto 26px;
+  }
+  .download-wrap{
+    display:flex;
+    justify-content:center;
+  }
+  .confirm-msg{
+    text-align:center;
+    color: var(--success);
+    font-weight:600;
+    font-size:.9rem;
+    margin-top:16px;
+    display:none;
+  }
+  .confirm-msg.show{ display:block; }
+
+  footer.site-footer{
+    text-align:center;
+    color: var(--text-muted);
+    font-size:.78rem;
+    margin-top: 26px;
+  }
+
+  @media (max-width: 600px){
+    .card{ padding: 24px 20px 22px; }
+    .field-group{ margin-left: 0; }
+    .step h2{ font-size:1.02rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="brand-header">
+  <div class="brand-header-inner">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOYAAADmCAMAAAD2tAmJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGkUExURSZlriZlryZlriZkriZlriZlrSZlriVlriZmryZmriZlriZlriZlrSZlrixqslCMyCdmr0qHxXu143ex4USCwWai14K86Hy35Dt4u12Z0H655jZ0uH645T17vClnr4ir04Wo0XifzMfX6v///6C83GOQxbLJ4k+CvZ662+3y+K7F4SZkriZlryZlrkR6uXyizlyLwmqVxzRvs7vP5pKy10F4uMnZ69bi8PH1+uTs9TdxtGaTxr/R59Pg7/X4+8LU6I+w1S1qsUh9u2KQxOfu9nefzG2Yyfz9/uDp9DpztjBsstDd7UR7ud3n8szb7MXW6Yyt1FmJwWCOxLTK4z52t3Scy6rD36O+3SZlrpa02G2XyEB3uIKm0LrO5VWHwMva7O/z+dzm8t/o8zZxtCZlrazE4LjM5Pj6/HCZyvr7/XmgzVKEvu7z+SZmrtrl8Y6v1d7n86jB3kt/vPT3+3uhzpm32YOn0ePr9CZlruvx96fA3kV7uShmrydlrp252nGayiVlriZlryZlrSZkrSZlriZlriZmryZlryZlriZlriZlrSZlrkdt6WcAAACMdFJOU//+/v79/fz8+/v7+vr5///////////////////////////////////////5+Pj////////////////////////////////////////////////////////3///////////////3///////////2//////////////b/////9f//9fT09PPy8fHx8PDv8uAUMQAAAAlwSFlzAAAOwwAADsMBx2+oZAAAB6lJREFUeF7tmvd/20QUwI+9N4TtGE4gEEuWZVtqmuESN0lDZ2hKoZSdMEqB0gJt2Xv803zeLZ1OlkKplcTP7/tDc3p3Gl/f6ZbKGEEQBEGMgmvcAE5IExPXugGckCYmSBMTpImJCdG8zg3ghDQxMSGa17sBnJAmJkgTE6SJCdLExIRo3uAGcEKamJgQzRvdAE5IExOkiQnSxARpYoI0MTEhmje5AZxMiObNbgAnpImJW9wATiZE81Y3gBPSxARpYoI0MUGamJgQzdvcAE5IExOkiQnSxARpYuJ2N4AT0sQEaWLiDjeA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" alt="Impact Plus">
+    <div class="brand-header-text">
+      <h1>Questionnaire Préliminaire</h1>
+      <p>Organisation du Team Building — CAGD</p>
+    </div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="card">
+
+    <div class="intro-block">
+      Dans le cadre de la préparation d'une proposition d'accompagnement pour l'organisation du Team Building de la <strong>Caisse Autonome de Gestion de la Dette (CAGD)</strong>, le présent questionnaire vise à recueillir les principales informations nécessaires à la conception d'une offre adaptée aux objectifs, aux attentes et aux contraintes de l'institution.
+      <br><br>
+      Les informations recueillies permettront à <strong>IMPACT PLUS</strong> de proposer un format, un programme d'activités et un dispositif organisationnel appropriés.
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label">
+        <span>Étape <span id="stepCurrent">1</span> / <span id="stepTotal">11</span></span>
+        <span class="step-name" id="stepName">Participants</span>
+      </div>
+    </div>
+
+    <form id="questionnaireForm">
+
+      <!-- STEP 1 -->
+      <section class="step active" data-step="1" data-name="Participants">
+        <h2><span class="step-num">1</span> Participants</h2>
+
+        <div class="field-group">
+          <label class="field-label">Effectif prévisionnel</label>
+          <div class="with-inline-text">
+            <input type="number" id="effectif" min="0" class="inline-input" placeholder="Nombre">
+            <span>personnes</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Profils concernés</label>
+          <ul class="checkbox-list">
+            <li><input type="checkbox" id="profil_direction" name="profils"><label for="profil_direction">Direction</label></li>
+            <li><input type="checkbox" id="profil_cadres" name="profils"><label for="profil_cadres">Cadres</label></li>
+            <li><input type="checkbox" id="profil_agents" name="profils"><label for="profil_agents">Agents</label></li>
+            <li><input type="checkbox" id="profil_ensemble" name="profils"><label for="profil_ensemble">Ensemble du personnel</label></li>
+          </ul>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Tranche d'âge dominante (approximative)</label>
+          <input type="text" id="tranche_age" placeholder="Ex : 30 - 45 ans">
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" data-step="2" data-name="Objectifs prioritaires">
+        <h2><span class="step-num">2</span> Objectifs prioritaires</h2>
+
+        <div class="field-group">
+          <ul class="checkbox-list">
+            <li><input type="checkbox" id="obj_cohesion" name="objectifs"><label for="obj_cohesion">Renforcer la cohésion d'équipe</label></li>
+            <li><input type="checkbox" id="obj_communication" name="objectifs"><label for="obj_communication">Améliorer la communication interne</label></li>
+            <li><input type="checkbox" id="obj_decloisonner" name="objectifs"><label for="obj_decloisonner">Décloisonner les services/directions</label></li>
+            <li><input type="checkbox" id="obj_collaboration" name="objectifs"><label for="obj_collaboration">Renforcer la collaboration et l'esprit d'équipe</label></li>
+            <li><input type="checkbox" id="obj_confiance" name="objectifs"><label for="obj_confiance">Favoriser la confiance entre collaborateurs</label></li>
+            <li><input type="checkbox" id="obj_valeurs" name="objectifs"><label for="obj_valeurs">Mobiliser autour des valeurs de la CAGD</label></li>
+            <li><input type="checkbox" id="obj_stress" name="objectifs"><label for="obj_stress">Gestion du stress / bien-être au travail</label></li>
+            <li><input type="checkbox" id="obj_celebrer" name="objectifs"><label for="obj_celebrer">Célébrer les résultats ou un événement particulier</label></li>
+            <li class="with-inline-text">
+              <input type="checkbox" id="obj_autre" name="objectifs"><label for="obj_autre">Autre :</label>
+              <input type="text" id="obj_autre_texte" class="inline-input">
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" data-step="3" data-name="Contexte particulier">
+        <h2><span class="step-num">3</span> Contexte particulier</h2>
+        <div class="field-group">
+          <label class="field-label">Existe-t-il des enjeux internes que le Team Building devrait contribuer à adresser (réorganisation, nouveaux collaborateurs, difficultés de collaboration, changement organisationnel, etc.) ?</label>
+          <textarea id="contexte_particulier" placeholder="Votre réponse..."></textarea>
+        </div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="step" data-step="4" data-name="Date et durée souhaitées">
+        <h2><span class="step-num">4</span> Date et durée souhaitées</h2>
+
+        <div class="field-group">
+          <label class="field-label">Date/période envisagée</label>
+          <input type="text" id="date_periode" placeholder="Ex : Novembre 2026">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Format</label>
+          <ul class="radio-list">
+            <li><input type="radio" id="format_demi" name="format" value="Demi-journée"><label for="format_demi">Demi-journée</label></li>
+            <li><input type="radio" id="format_jour" name="format" value="Journée"><label for="format_jour">Journée</label></li>
+            <li><input type="radio" id="format_2jours" name="format" value="2 jours"><label for="format_2jours">2 jours</label></li>
+          </ul>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Jour souhaité</label>
+          <ul class="radio-list">
+            <li><input type="radio" id="jour_semaine" name="jour" value="Semaine"><label for="jour_semaine">Semaine</label></li>
+            <li><input type="radio" id="jour_weekend" name="jour" value="Week-end"><label for="jour_weekend">Week-end</label></li>
+            <li><input type="radio" id="jour_indifferent" name="jour" value="Indifférent"><label for="jour_indifferent">Indifférent</label></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- STEP 5 -->
+      <section class="step" data-step="5" data-name="Lieu">
+        <h2><span class="step-num">5</span> Lieu</h2>
+
+        <div class="field-group">
+          <ul class="checkbox-list">
+            <li><input type="checkbox" id="lieu_locaux_cagd" name="lieu"><label for="lieu_locaux_cagd">Dans les locaux de la CAGD</label></li>
+            <li><input type="checkbox" id="lieu_hors_locaux" name="lieu"><label for="lieu_hors_locaux">Hors des locaux</label></li>
+            <li><input type="checkbox" id="lieu_cotonou" name="lieu"><label for="lieu_cotonou">Cotonou / environs</label></li>
+            <li class="with-inline-text">
+              <input type="checkbox" id="lieu_autre" name="lieu"><label for="lieu_autre">Autre destination :</label>
+              <input type="text" id="lieu_autre_texte" class="inline-input">
+            </li>
+          </ul>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">La CAGD dispose-t-elle déjà d'un site ?</label>
+          <ul class="radio-list">
+            <li><input type="radio" id="site_oui" name="site_existant" value="Oui"><label for="site_oui">Oui</label></li>
+            <li><input type="radio" id="site_non" name="site_existant" value="Non"><label for="site_non">Non</label></li>
+          </ul>
+          <div class="subfield">
+            <label class="field-label">Si oui</label>
+            <input type="text" id="site_precision">
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 6 -->
+      <section class="step" data-step="6" data-name="Type d'activités souhaité">
+        <h2><span class="step-num">6</span> Type d'activités souhaité</h2>
+
+        <div class="field-group">
+          <ul class="checkbox-list">
+            <li><input type="checkbox" id="act_ludiques" name="activites"><label for="act_ludiques">Activités ludiques et collaboratives</label></li>
+            <li><input type="checkbox" id="act_challenges" name="activites"><label for="act_challenges">Challenges / compétitions par équipes</label></li>
+            <li><input type="checkbox" id="act_sportives" name="activites"><label for="act_sportives">Activités sportives légères</label></li>
+            <li><input type="checkbox" id="act_reflexion" name="activites"><label for="act_reflexion">Réflexion / intelligence collective</label></li>
+            <li><input type="checkbox" id="act_creatives" name="activites"><label for="act_creatives">Activités créatives</label></li>
+            <li><input type="checkbox" id="act_detente" name="activites"><label for="act_detente">Détente / bien-être</label></li>
+            <li><input type="checkbox" id="act_combinaison" name="activites"><label for="act_combinaison">Combinaison de plusieurs formats</label></li>
+          </ul>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Activités ou contraintes à éviter</label>
+          <input type="text" id="act_a_eviter">
+        </div>
+      </section>
+
+      <!-- STEP 7 -->
+      <section class="step" data-step="7" data-name="Prestations IMPACT PLUS">
+        <h2><span class="step-num">7</span> Prestations à prendre en charge par IMPACT PLUS</h2>
+
+        <div class="field-group">
+          <ul class="checkbox-list">
+            <li><input type="checkbox" id="prest_conception" name="prestations"><label for="prest_conception">Conception et animation du Team Building</label></li>
+            <li><input type="checkbox" id="prest_site" name="prestations"><label for="prest_site">Recherche/réservation du site</label></li>
+            <li><input type="checkbox" id="prest_transport" name="prestations"><label for="prest_transport">Transport</label></li>
+            <li><input type="checkbox" id="prest_restauration" name="prestations"><label for="prest_restauration">Restauration / pauses</label></li>
+            <li><input type="checkbox" id="prest_materiel" name="prestations"><label for="prest_materiel">Matériel et équipements</label></li>
+            <li><input type="checkbox" id="prest_sonorisation" name="prestations"><label for="prest_sonorisation">Sonorisation</label></li>
+            <li><input type="checkbox" id="prest_photo" name="prestations"><label for="prest_photo">Photographie / vidéo</label></li>
+            <li><input type="checkbox" id="prest_branding" name="prestations"><label for="prest_branding">Branding / supports</label></li>
+            <li><input type="checkbox" id="prest_cadeaux" name="prestations"><label for="prest_cadeaux">Cadeaux / récompenses</label></li>
+            <li><input type="checkbox" id="prest_complete" name="prestations"><label for="prest_complete">Prise en charge complète de l'événement</label></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- STEP 8 -->
+      <section class="step" data-step="8" data-name="Budget">
+        <h2><span class="step-num">8</span> Budget</h2>
+
+        <div class="field-group">
+          <ul class="checkbox-list">
+            <li class="with-inline-text">
+              <input type="checkbox" id="budget_defini" name="budget"><label for="budget_defini">Budget déjà défini :</label>
+              <input type="text" id="budget_defini_montant" class="inline-input" placeholder="Montant">
+              <span>FCFA</span>
+            </li>
+            <li class="with-inline-text">
+              <input type="checkbox" id="budget_fourchette" name="budget"><label for="budget_fourchette">Fourchette budgétaire disponible :</label>
+              <input type="text" id="budget_fourchette_montant" class="inline-input">
+            </li>
+            <li><input type="checkbox" id="budget_proposer" name="budget"><label for="budget_proposer">Budget à proposer par IMPACT PLUS</label></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- STEP 9 -->
+      <section class="step" data-step="9" data-name="Contraintes particulières">
+        <h2><span class="step-num">9</span> Contraintes particulières</h2>
+        <div class="field-group">
+          <label class="field-label">Contraintes institutionnelles, sécuritaires, alimentaires, médicales, vestimentaires ou autres à prendre en compte</label>
+          <textarea id="contraintes_particulieres" placeholder="Votre réponse..."></textarea>
+        </div>
+      </section>
+
+      <!-- STEP 10 -->
+      <section class="step" data-step="10" data-name="Validation et organisation">
+        <h2><span class="step-num">10</span> Validation et organisation</h2>
+
+        <div class="field-group">
+          <label class="field-label">Interlocuteur principal</label>
+          <input type="text" id="interlocuteur">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Fonction</label>
+          <input type="text" id="fonction">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Délai souhaité pour recevoir l'offre</label>
+          <input type="text" id="delai_offre">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Processus particulier de validation/commande à anticiper</label>
+          <input type="text" id="processus_validation">
+        </div>
+      </section>
+
+      <!-- STEP 11 - FINAL -->
+      <section class="step" data-step="11" data-name="Téléchargement">
+        <div class="final-center">
+          <div class="final-icon">✅</div>
+          <h2 style="justify-content:center;">Merci d'avoir complété le questionnaire</h2>
+          <p>Vos réponses sont prêtes. Cliquez ci-dessous pour télécharger automatiquement le rapport récapitulatif au format PDF.</p>
+        </div>
+        <div class="download-wrap">
+          <button type="button" class="btn-download" id="downloadBtn">⬇ Télécharger le rapport (PDF)</button>
+        </div>
+        <div class="confirm-msg" id="confirmMsg">Le téléchargement du rapport a démarré ✔</div>
+      </section>
+
+      <div class="nav-buttons">
+        <button type="button" class="btn-prev" id="prevBtn" disabled>&larr; Précédent</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn-next" id="nextBtn">Suivant &rarr;</button>
+      </div>
+
+    </form>
+  </div>
+
+  <footer class="site-footer">
+    IMPACT PLUS — Questionnaire Préliminaire · Team Building CAGD
+  </footer>
+</div>
+
+<script>
+  const totalSteps = 11;
+  let currentStep = 1;
+
+  const steps = document.querySelectorAll('.step');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressFill = document.getElementById('progressFill');
+  const stepCurrentEl = document.getElementById('stepCurrent');
+  const stepNameEl = document.getElementById('stepName');
+
+  function updateStepDisplay(){
+    steps.forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.step) === currentStep);
+    });
+
+    const activeStepEl = document.querySelector('.step[data-step="' + currentStep + '"]');
+    stepNameEl.textContent = activeStepEl.dataset.name;
+    stepCurrentEl.textContent = currentStep;
+    progressFill.style.width = ((currentStep - 1) / (totalSteps - 1) * 100) + '%';
+
+    prevBtn.disabled = currentStep === 1;
+
+    if(currentStep === totalSteps){
+      nextBtn.style.display = 'none';
+    } else {
+      nextBtn.style.display = 'inline-block';
+      nextBtn.textContent = (currentStep === totalSteps - 1) ? 'Terminer →' : 'Suivant →';
+    }
+
+    window.scrollTo({top: 0, behavior:'smooth'});
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if(currentStep > 1){
+      currentStep--;
+      updateStepDisplay();
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if(currentStep < totalSteps){
+      currentStep++;
+      updateStepDisplay();
+    }
+  });
+
+  updateStepDisplay();
+
+  // ---------- PDF GENERATION ----------
+
+  function checkedLabel(id, text){
+    const el = document.getElementById(id);
+    return el && el.checked ? text : null;
+  }
+
+  function val(id){
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function radioValue(name){
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  function collectMultiCheck(items){
+    // items: array of [id, label]
+    return items.map(([id, label]) => checkedLabel(id, label)).filter(Boolean);
+  }
+
+  function buildReportData(){
+    const data = [];
+
+    data.push({ title: '1. Participants', lines: [
+      'Effectif prévisionnel : ' + (val('effectif') || '—') + ' personnes',
+      'Profils concernés : ' + (collectMultiCheck([
+        ['profil_direction','Direction'],
+        ['profil_cadres','Cadres'],
+        ['profil_agents','Agents'],
+        ['profil_ensemble','Ensemble du personnel']
+      ]).join(', ') || '—'),
+      "Tranche d'âge dominante (approximative) : " + (val('tranche_age') || '—')
+    ]});
+
+    let objectifs = collectMultiCheck([
+      ['obj_cohesion',"Renforcer la cohésion d'équipe"],
+      ['obj_communication','Améliorer la communication interne'],
+      ['obj_decloisonner','Décloisonner les services/directions'],
+      ['obj_collaboration',"Renforcer la collaboration et l'esprit d'équipe"],
+      ['obj_confiance','Favoriser la confiance entre collaborateurs'],
+      ['obj_valeurs','Mobiliser autour des valeurs de la CAGD'],
+      ['obj_stress','Gestion du stress / bien-être au travail'],
+      ['obj_celebrer','Célébrer les résultats ou un événement particulier']
+    ]);
+    if(document.getElementById('obj_autre').checked){
+      objectifs.push('Autre : ' + (val('obj_autre_texte') || '—'));
+    }
+    data.push({ title: '2. Objectifs prioritaires', lines: objectifs.length ? objectifs : ['—'] });
+
+    data.push({ title: '3. Contexte particulier', lines: [ val('contexte_particulier') || '—' ] });
+
+    data.push({ title: '4. Date et durée souhaitées', lines: [
+      'Date/période envisagée : ' + (val('date_periode') || '—'),
+      'Format : ' + (radioValue('format') || '—'),
+      'Jour souhaité : ' + (radioValue('jour') || '—')
+    ]});
+
+    let lieu = collectMultiCheck([
+      ['lieu_locaux_cagd','Dans les locaux de la CAGD'],
+      ['lieu_hors_locaux','Hors des locaux'],
+      ['lieu_cotonou','Cotonou / environs']
+    ]);
+    if(document.getElementById('lieu_autre').checked){
+      lieu.push('Autre destination : ' + (val('lieu_autre_texte') || '—'));
+    }
+    data.push({ title: '5. Lieu', lines: [
+      ...(lieu.length ? lieu : ['—']),
+      "La CAGD dispose-t-elle déjà d'un site ? " + (radioValue('site_existant') || '—'),
+      'Si oui : ' + (val('site_precision') || '—')
+    ]});
+
+    let activites = collectMultiCheck([
+      ['act_ludiques','Activités ludiques et collaboratives'],
+      ['act_challenges','Challenges / compétitions par équipes'],
+      ['act_sportives','Activités sportives légères'],
+      ['act_reflexion','Réflexion / intelligence collective'],
+      ['act_creatives','Activités créatives'],
+      ['act_detente','Détente / bien-être'],
+      ['act_combinaison','Combinaison de plusieurs formats']
+    ]);
+    data.push({ title: "6. Type d'activités souhaité", lines: [
+      ...(activites.length ? activites : ['—']),
+      'Activités ou contraintes à éviter : ' + (val('act_a_eviter') || '—')
+    ]});
+
+    let prestations = collectMultiCheck([
+      ['prest_conception','Conception et animation du Team Building'],
+      ['prest_site','Recherche/réservation du site'],
+      ['prest_transport','Transport'],
+      ['prest_restauration','Restauration / pauses'],
+      ['prest_materiel','Matériel et équipements'],
+      ['prest_sonorisation','Sonorisation'],
+      ['prest_photo','Photographie / vidéo'],
+      ['prest_branding','Branding / supports'],
+      ['prest_cadeaux','Cadeaux / récompenses'],
+      ['prest_complete',"Prise en charge complète de l'événement"]
+    ]);
+    data.push({ title: '7. Prestations à prendre en charge par IMPACT PLUS', lines: prestations.length ? prestations : ['—'] });
+
+    let budget = [];
+    if(document.getElementById('budget_defini').checked){
+      budget.push('Budget déjà défini : ' + (val('budget_defini_montant') || '—') + ' FCFA');
+    }
+    if(document.getElementById('budget_fourchette').checked){
+      budget.push('Fourchette budgétaire disponible : ' + (val('budget_fourchette_montant') || '—'));
+    }
+    if(document.getElementById('budget_proposer').checked){
+      budget.push('Budget à proposer par IMPACT PLUS');
+    }
+    data.push({ title: '8. Budget', lines: budget.length ? budget : ['—'] });
+
+    data.push({ title: '9. Contraintes particulières', lines: [ val('contraintes_particulieres') || '—' ] });
+
+    data.push({ title: '10. Validation et organisation', lines: [
+      'Interlocuteur principal : ' + (val('interlocuteur') || '—'),
+      'Fonction : ' + (val('fonction') || '—'),
+      "Délai souhaité pour recevoir l'offre : " + (val('delai_offre') || '—'),
+      'Processus particulier de validation/commande à anticiper : ' + (val('processus_validation') || '—')
+    ]});
+
+    return data;
+  }
+
+  function generatePDF(){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 50;
+    const brandBlue = [38, 101, 174];
+    const brandBlueDark = [27, 76, 135];
+    const textDark = [31, 41, 55];
+    const textMuted = [107, 114, 128];
+
+    let y = 0;
+
+    function addHeader(){
+      doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+      doc.rect(0, 0, pageWidth, 80, 'F');
+      doc.setTextColor(255,255,255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('IMPACT PLUS', margin, 34);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+      doc.text('Rapport — Questionnaire Préliminaire · Team Building CAGD', margin, 54);
+      y = 105;
+    }
+
+    function addFooter(pageNum){
+      doc.setFontSize(8.5);
+      doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
+      doc.text('IMPACT PLUS — Rapport généré automatiquement', margin, pageHeight - 25);
+      doc.text('Page ' + pageNum, pageWidth - margin - 30, pageHeight - 25);
+    }
+
+    function ensureSpace(neededHeight){
+      if(y + neededHeight > pageHeight - 50){
+        addFooter(doc.internal.getNumberOfPages());
+        doc.addPage();
+        addHeader();
+      }
+    }
+
+    addHeader();
+
+    doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
+    doc.setFontSize(9.5);
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-FR') + ' à ' + now.toLocaleTimeString('fr-FR');
+    doc.text('Généré le ' + dateStr, margin, y);
+    y += 22;
+
+    const sections = buildReportData();
+    const contentWidth = pageWidth - margin * 2;
+
+    sections.forEach(section => {
+      ensureSpace(40);
+
+      doc.setFillColor(232, 240, 250);
+      doc.roundedRect(margin, y - 14, contentWidth, 22, 3, 3, 'F');
+      doc.setTextColor(brandBlueDark[0], brandBlueDark[1], brandBlueDark[2]);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11.5);
+      doc.text(section.title, margin + 8, y + 1);
+      y += 24;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+
+      section.lines.forEach(line => {
+        const wrapped = doc.splitTextToSize('•  ' + line, contentWidth - 8);
+        wrapped.forEach((wLine, idx) => {
+          ensureSpace(16);
+          doc.text(wLine, margin + 8, y);
+          y += 14.5;
+        });
+      });
+
+      y += 10;
+    });
+
+    addFooter(doc.internal.getNumberOfPages());
+
+    doc.save('Rapport_Questionnaire_TeamBuilding_CAGD.pdf');
+  }
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    generatePDF();
+    const msg = document.getElementById('confirmMsg');
+    msg.classList.add('show');
+  });
+</script>
+
+</body>
+</html>
